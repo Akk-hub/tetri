@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id ="can"> </canvas>
+    <div class="back"></div>
+    <script>
+        const GAME_SPEED = 1000;
+
+        const FIELD_COL = 10;
+        const FIELD_ROW = 20;
+
+        
+        const BLOCK_SIZE = 30;
+
+        const SCREEN_W = BLOCK_SIZE * FIELD_COL;
+        const SCREEN_H = BLOCK_SIZE * FIELD_ROW;
+
+        const TETRO_SIZE = 4;
+
+        let can = document.getElementById("can");
+        let con = can.getContext("2d");
+
+        let background = new Image();
+        background.src = "/phonto.jpg";
+
+        let canvas_width = BLOCK_SIZE * FIELD_COL * 2;
+        let canvas_height = BLOCK_SIZE * FIELD_ROW * 2;
+        background.onload = function() {
+            // con.drawImage(background,-400,-100);
+        }
+
+        let blimage1 = new Image();
+        blimage1.src = "/phonto2.png";
+        let blimage2 = new Image();
+        blimage2.src = "/phonto3.png";
+        let blimage3 = new Image();
+        blimage3.src = "/phonto4.png";
+        let blimage4 = new Image();
+        blimage4.src = "/phonto5.png";
+        let blimage5 = new Image();
+        blimage5.src = "/phonto6.png";
+        let blimage6 = new Image();
+        blimage6.src = "/phonto7.png";
+        let blimage7 = new Image();
+        blimage7.src = "/phonto8.png";
+
+        let game_over = new Image();
+        game_over.src = "/game_over.png";
+
+        can.width = SCREEN_W;
+        can.height = SCREEN_H;
+        can.style.border = "4px solid #555";
+
+        const TETRO_TYPES = [
+            [],
+            [
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 1, 0],
+                [0, 0, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [1, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [0, 1, 1, 0],
+                [1, 1, 0, 0],
+                [0, 0, 0, 0]
+            ]
+        ]
+
+        let se1, se2, se3;
+        se1 = new Audio("cancel.mp3");
+        se2 = new Audio("nyu.mp3");
+        se3 = new Audio("sound.m4a");
+
+
+        const START_X = FIELD_COL/2 - TETRO_SIZE/2;
+        const START_Y = 0;
+
+        //座標
+        let tetro_x = START_X;
+        let tetro_y = START_Y;
+
+        let tetro_t;
+
+        let field = [];
+
+        over = false;
+
+        
+
+        tetro_t = Math.floor(Math.random()*(TETRO_TYPES.length-1)+1)
+        tetro = TETRO_TYPES[tetro_t];
+
+        init();
+        drawAll();
+
+        setInterval(dropTetro, GAME_SPEED);
+
+        function init() {
+            for (let y=0; y<FIELD_ROW; y++){
+                field[y] = [];
+                for (let x=0; x<FIELD_COL; x++){
+                    field[y][x] = 0;
+                }
+            }
+        }
+
+        function drawBlock(x, y, c) {
+            let px = x * BLOCK_SIZE;
+            let py = y * BLOCK_SIZE;
+            if(c === 1){
+            con.drawImage(blimage1,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+            if(c === 2){
+            con.drawImage(blimage2,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+            if(c === 3){
+            con.drawImage(blimage3,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+            if(c === 4){
+            con.drawImage(blimage4,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+            if(c === 5){
+            con.drawImage(blimage5,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+            if(c === 6){
+            con.drawImage(blimage6,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+            if(c === 7){
+            con.drawImage(blimage7,
+            0,0,
+            BLOCK_SIZE,BLOCK_SIZE,
+            px,py,
+            BLOCK_SIZE,BLOCK_SIZE);
+            }
+        }
+
+        function drawAll() {
+            con.drawImage(background,-50
+            ,-50,canvas_width, background.height * canvas_width / background.width);
+            // con.clearRect(0, 0, SCREEN_W, SCREEN_H);
+            
+            let plus = 0;
+            while(checkMove(0,plus+1))plus++;
+
+            for(let y=0; y<TETRO_SIZE; y++) {
+                for(let x=0; x<TETRO_SIZE; x++) {
+                    if(tetro[y][x]) {
+                        drawBlock(tetro_x + x, tetro_y + y + plus, 0);
+                        drawBlock(tetro_x + x, tetro_y + y, tetro_t);
+                    }
+                } 
+            }
+        
+            for(let y=0; y<FIELD_ROW; y++) {
+                for(let x=0; x<FIELD_COL; x++) {
+                    if(field[y][x]) {
+                        drawBlock(x, y, field[y][x]);
+                        
+                    }
+                } 
+            }
+
+           
+            
+
+            if(over) {
+                con.clearRect(0, 0, SCREEN_W, SCREEN_H);
+                con.drawImage(game_over,0,0,300,600,0,0,300,600);
+                let s = "GAME OVER";
+                con.font = "40px 'MS ゴシック'";
+                let w = con.measureText(s).width;
+                let x = SCREEN_W/2 - w/2;
+                let y = SCREEN_H/2 - 20;
+                con.lineWidth = 4;
+                con.strokeText(s, x, y);
+                con.fillStyle="white";
+                con.fillText(s,x,y);
+            }
+        }
+
+        function  checkMove(mx, my, ntetro)  {
+            if(ntetro == undefined) ntetro = tetro;
+            for(let y=0; y<TETRO_SIZE; y++) {
+                for(let x=0; x<TETRO_SIZE; x++) {
+                    let nx = tetro_x + mx + x;
+                    let ny = tetro_y + my + y;
+                    if(tetro[y][x]) {
+                        if(
+                         ny < 0 ||
+                         nx < 0 ||
+                         ny >= FIELD_ROW ||
+                         nx >= FIELD_COL ||
+                         field[ny][nx]) return false;
+                } 
+            }
+        }
+        return true;
+    }
+    function rotate() {
+        let ntetro = [];
+        for(let y=0; y<TETRO_SIZE; y++) {
+            ntetro[y] = [];
+                for(let x=0; x<TETRO_SIZE; x++) {
+                   ntetro[y][x] = tetro[TETRO_SIZE-x-1][y];
+                } 
+            }
+        return ntetro;
+    }
+
+    function fixTetro() {
+        for(let y=0; y<TETRO_SIZE; y++) {
+                for(let x=0; x<TETRO_SIZE; x++) {
+                  if(tetro[y][x]){
+                      field[tetro_y + y][tetro_x + x] = tetro_t;
+                  }
+                } 
+            }
+    }
+    
+    function checkLine() {
+        let linec=0;
+        let score = 0;
+        
+        for(let y=0; y<FIELD_ROW; y++) {
+            let flag = true;
+                for(let x=0; x<FIELD_COL; x++) {
+                  if(!field[y][x]){
+                      flag=false;
+                      break;
+                  }
+                } 
+                if(flag){
+                    se1.play();
+
+                    for(let ny = y; ny>0; ny--){
+                        for(let nx=0; nx<FIELD_COL; nx++){
+                            field[ny][nx] = field[ny-1][nx];
+                        }
+                    }
+                }
+            }
+           
+    }
+    
+
+    function dropTetro() {
+        if(over) return;
+
+        if(checkMove(0, 1))tetro_y++;
+        else {
+             fixTetro();
+             checkLine();
+             tetro_t = Math.floor(Math.random()*(TETRO_TYPES.length-1)+1)
+             tetro = TETRO_TYPES[tetro_t];
+             tetro_x = START_X;
+             tetro_y = START_Y;
+
+             if(!checkMove(0, 0)){
+                 over = true;
+             }
+        }
+
+        drawAll();
+    }
+
+        document.onkeydown = function(e){
+            if(over) return;
+                switch(e.keyCode){
+                    case 37:  //left
+                        if(checkMove(-1, 0))tetro_x--;
+                        console.log('unko' + tetro_x);
+                    break;
+                    // case 38:  //up
+                    // if(checkMove(0, -1))tetro_y--;
+                    // break;
+                    case 39:  //right
+                        if(checkMove(1, 0))tetro_x++;
+                        break;
+                    case 40:  //down
+                        if(checkMove(0, 1))tetro_y++;
+                        break;
+                    case 32:  //spaceKey
+                        let ntetro = rotate();
+                        if(checkMove(0, 0, ntetro)) tetro = rotate();
+                    break;
+                    case 13:
+                        while(checkMove(0, 1)){
+                            tetro_y++;
+                        }
+                }
+                drawAll();
+        }
+            
+       
+
+    </script>
+</body>
+</html>
